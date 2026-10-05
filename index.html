@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Weather Forecast API</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f8fafc;
+            color: #172033;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        .navbar {
+            height: 78px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 45px;
+            border-bottom: 1px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 21px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            font-size: 30px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 35px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #172033;
+            font-size: 16px;
+        }
+
+        .nav-links a:hover {
+            color: #1677d2;
+        }
+
+        .nav-links .active {
+            font-weight: bold;
+            color: #1677d2;
+        }
+
+        .nav-icons {
+            display: flex;
+            gap: 22px;
+            font-size: 23px;
+        }
+
+        /* ================= HERO ================= */
+
+        .hero {
+            height: 390px;
+
+            background:
+                linear-gradient(
+                    rgba(30, 80, 125, 0.25),
+                    rgba(20, 75, 120, 0.25)
+                ),
+                url("https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=2000&q=80");
+
+            background-size: cover;
+            background-position: center;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            text-align: center;
+            color: white;
+        }
+
+        .hero-icon {
+            font-size: 65px;
+            margin-bottom: 18px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 400;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .hero p {
+            font-size: 20px;
+            margin-top: 20px;
+            max-width: 700px;
+            line-height: 1.5;
+        }
+
+        /* ================= MAIN LAYOUT ================= */
+
+        .main-container {
+            display: flex;
+            min-height: 600px;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            width: 260px;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            padding: 30px 25px;
+        }
+
+        .sidebar h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+
+        .sidebar-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .sidebar-item {
+            padding: 11px 10px;
+            color: #374151;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .sidebar-item:hover {
+            background: #eef6ff;
+            color: #1677d2;
+        }
+
+        .sidebar-item.active {
+            background: #eaf4ff;
+            color: #1677d2;
+            font-weight: bold;
+        }
+
+        /* ================= CONTENT ================= */
+
+        .content {
+            flex: 1;
+            padding: 45px;
+            max-width: 1200px;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 400;
+            margin-bottom: 30px;
+        }
+
+        /* ================= LOCATION CARD ================= */
+
+        .location-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+        }
+
+        .location-label {
+            color: #57708c;
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.2fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 7px;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #d5dce5;
+            border-radius: 7px;
+            font-size: 16px;
+            outline: none;
+            background: white;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            border-color: #1677d2;
+            box-shadow: 0 0 0 3px rgba(22,119,210,0.1);
+        }
+
+        .search-btn {
+            padding: 14px 25px;
+            border: none;
+            border-radius: 7px;
+            background: #1677d2;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            height: 48px;
+        }
+
+        .search-btn:hover {
+            background: #095da8;
+        }
+
+        /* ================= CITY SEARCH ================= */
+
+        .city-search {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #edf0f4;
+        }
+
+        .city-search-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .city-search input {
+            flex: 1;
+            padding: 14px;
+            border: 1px solid #d5dce5;
+            border-radius: 7px;
+            font-size: 16px;
+        }
+
+        /* ================= RESULTS ================= */
+
+        .result {
+            margin-top: 35px;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .result-header h2 {
+            font-size: 28px;
+            font-weight: 400;
+        }
+
+        .status {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .weather-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .weather-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+        }
+
+        .weather-card .icon {
+            font-size: 35px;
+            margin-bottom: 15px;
+        }
+
+        .weather-card .label {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .weather-card .value {
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        /* ================= API INFO ================= */
+
+        .api-info {
+            margin-top: 35px;
+            background: #172033;
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        .api-info h3 {
+            margin-bottom: 15px;
+        }
+
+        .api-url {
+            background: #0c1320;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            color: #b9e0ff;
+        }
+
+        /* ================= FOOTER ================= */
+
+        footer {
+            background: #172033;
+            color: #cbd5e1;
+            text-align: center;
+            padding: 25px;
+            font-size: 14px;
+        }
+
+        /* ================= LOADING ================= */
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #64748b;
+        }
+
+        .error {
+            background: #fff1f2;
+            color: #be123c;
+            padding: 15px;
+            border-radius: 7px;
+            margin-top: 20px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media(max-width: 900px) {
+
+            .sidebar {
+                display: none;
+            }
+
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+
+            .weather-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content {
+                padding: 25px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 35px;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+
+    <!-- ================= NAVIGATION ================= -->
+
+    <header class="navbar">
+
+        <div class="logo">
+            <span class="logo-icon">🌤️</span>
+            <span>Weather API</span>
+        </div>
+
+        <nav class="nav-links">
+            <a href="#">Home</a>
+            <a href="#">Features</a>
+            <a href="#" class="active">API Docs</a>
+        </nav>
+
+        <div class="nav-icons">
+            <span>◐</span>
+            <span>☀</span>
+        </div>
+
+    </header>
+
+
+    <!-- ================= HERO ================= -->
+
+    <section class="hero">
+
+        <div class="hero-icon">☁️</div>
+
+        <h1>Weather Forecast API</h1>
+
+        <p>
+            Seamless integration of weather data using
+            a simple HTTP API
+        </p>
+
+    </section>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <div class="main-container">
+
+
+        <!-- ================= SIDEBAR ================= -->
+
+        <aside class="sidebar">
+
+            <div class="sidebar-section">
+
+                <h3>Weather Forecast</h3>
+
+                <div class="sidebar-item active">
+                    Location & Time
+                </div>
+
+                <div class="sidebar-item">
+                    Current Weather
+                </div>
+
+                <div class="sidebar-item">
+                    Temperature
+                </div>
+
+                <div class="sidebar-item">
+                    Humidity
+                </div>
+
+                <div class="sidebar-item">
+                    Wind Speed
+                </div>
+
+            </div>
+
+
+            <div class="sidebar-section">
+
+                <div class="sidebar-title">
+                    Weather Models
+                </div>
+
+                <div class="sidebar-item">
+                    DWD Germany
+                </div>
+
+                <div class="sidebar-item">
+                    NOAA U.S.
+                </div>
+
+                <div class="sidebar-item">
+                    Météo-France
+                </div>
+
+                <div class="sidebar-item">
+                    ECMWF
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- ================= CONTENT ================= -->
+
+        <main class="content">
+
+            <h2 class="section-title">
+                Location and Time
+            </h2>
+
+
+            <!-- LOCATION -->
+
+            <div class="location-card">
+
+                <div class="location-label">
+                    Location:
+                </div>
+
+                <div class="input-row">
+
+
+                    <div class="input-group">
+
+                        <label>
+                            Latitude
+                        </label>
+
+                        <input
+                            type="number"
+                            id="latitude"
+                            value="11.0168"
+                            step="0.0001"
+                        >
+
+                    </div>
+
+
+                    <div class="input-group">
+
+                        <label>
+                            Longitude
+                        </label>
+
+                        <input
+                            type="number"
+                            id="longitude"
+                            value="76.9558"
+                            step="0.0001"
+                        >
+
+                    </div>
+
+
+                    <div class="input-group">
+
+                        <label>
+                            Timezone
+                        </label>
+
+                        <select id="timezone">
+
+                            <option value="auto">
+                                Automatic
+                            </option>
+
+                            <option value="Asia/Kolkata">
+                                Asia/Kolkata
+                            </option>
+
+                            <option value="UTC">
+                                UTC
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <button
+                        class="search-btn"
+                        onclick="getWeatherByCoordinates()"
+                    >
+                        🔍 Search
+                    </button>
+
+                </div>
+
+
+                <!-- CITY SEARCH -->
+
+                <div class="city-search">
+
+                    <div class="location-label">
+                        Or search by city:
+                    </div>
+
+                    <div class="city-search-row">
+
+                        <input
+                            type="text"
+                            id="city"
+                            placeholder="Enter city name"
+                            value="Coimbatore"
+                        >
+
+                        <button
+                            class="search-btn"
+                            onclick="searchCity()"
+                        >
+                            Search City
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= RESULT ================= -->
+
+            <section class="result">
+
+                <div class="result-header">
+
+                    <h2 id="locationName">
+                        Coimbatore
+                    </h2>
+
+                    <span
+                        class="status"
+                        id="status"
+                    >
+                        Ready
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="weatherResult"
+                    class="weather-grid"
+                >
+
+                    <div class="weather-card">
+
+                        <div class="icon">🌡️</div>
+
+                        <div class="label">
+                            Temperature
+                        </div>
+
+                        <div
+                            class="value"
+                            id="temperature"
+                        >
+                            --
+                        </div>
+
+                    </div>
+
+
+                    <div class="weather-card">
+
+                        <div class="icon">💧</div>
+
+                        <div class="label">
+                            Humidity
+                        </div>
+
+                        <div
+                            class="value"
+                            id="humidity"
+                        >
+                            --
+                        </div>
+
+                    </div>
+
+
+                    <div class="weather-card">
+
+                        <div class="icon">💨</div>
+
+                        <div class="label">
+                            Wind Speed
+                        </div>
+
+                        <div
+                            class="value"
+                            id="wind"
+                        >
+                            --
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================= API INFORMATION ================= -->
+
+                <div class="api-info">
+
+                    <h3>
+                        🔗 API Request
+                    </h3>
+
+                    <p style="margin-bottom:15px;">
+                        This webpage sends a GET request to the
+                        Open-Meteo Weather API.
+                    </p>
+
+                    <div
+                        class="api-url"
+                        id="apiURL"
+                    >
+                        Waiting for API request...
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        Weather API Integration Demo |
+        Data provided by Open-Meteo
+
+    </footer>
+
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script>
+
+
+        /*
+        ==========================================
+        SEARCH CITY
+        ==========================================
+        */
+
+        async function searchCity() {
+
+            const city =
+                document.getElementById("city").value.trim();
+
+
+            if (city === "") {
+
+                alert("Please enter a city name.");
+
+                return;
+            }
+
+
+            document.getElementById("status").innerText =
+                "Searching city...";
+
+
+            try {
+
+                /*
+                Geocoding API
+
+                Converts:
+
+                City Name
+                     ↓
+                Latitude + Longitude
+                */
+
+                const geocodingURL =
+                    `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&format=json`;
+
+
+                const response =
+                    await fetch(geocodingURL);
+
+
+                const data =
+                    await response.json();
+
+
+                if (
+                    !data.results ||
+                    data.results.length === 0
+                ) {
+
+                    document.getElementById("status").innerText =
+                        "City not found.";
+
+                    return;
+                }
+
+
+                const location =
+                    data.results[0];
+
+
+                const latitude =
+                    location.latitude;
+
+
+                const longitude =
+                    location.longitude;
+
+
+                document.getElementById("latitude").value =
+                    latitude;
+
+
+                document.getElementById("longitude").value =
+                    longitude;
+
+
+                document.getElementById("locationName").innerText =
+                    location.name;
+
+
+                /*
+                Now get weather
+                */
+
+                getWeather(
+                    latitude,
+                    longitude,
+                    location.name
+                );
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                document.getElementById("status").innerText =
+                    "API Error";
+
+            }
+
+        }
+
+
+
+        /*
+        ==========================================
+        WEATHER API
+        ==========================================
+        */
+
+        async function getWeather(
+            latitude,
+            longitude,
+            cityName
+        ) {
+
+
+            document.getElementById("status").innerText =
+                "Fetching weather data...";
+
+
+            /*
+            Build Weather API URL
+            */
+
+            const weatherURL =
+                `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m`;
+
+
+            /*
+            Show API URL on webpage
+            */
+
+            document.getElementById("apiURL").innerText =
+                weatherURL;
+
+
+            try {
+
+
+                /*
+                SEND HTTP GET REQUEST
+                */
+
+                const response =
+                    await fetch(weatherURL);
+
+
+                /*
+                CONVERT RESPONSE TO JSON
+                */
+
+                const data =
+                    await response.json();
+
+
+                /*
+                DISPLAY DATA
+                */
+
+                document.getElementById("temperature").innerText =
+                    data.current.temperature_2m +
+                    " °C";
+
+
+                document.getElementById("humidity").innerText =
+                    data.current.relative_humidity_2m +
+                    " %";
+
+
+                document.getElementById("wind").innerText =
+                    data.current.wind_speed_10m +
+                    " km/h";
+
+
+                document.getElementById("locationName").innerText =
+                    cityName;
+
+
+                document.getElementById("status").innerText =
+                    "✓ API Response Received";
+
+
+            }
+
+
+            catch (error) {
+
+                console.error(error);
+
+
+                document.getElementById("status").innerText =
+                    "API Request Failed";
+
+
+                document.getElementById("weatherResult").innerHTML =
+
+                    `<div class="error">
+                        ❌ Unable to connect to the Weather API.
+                    </div>`;
+
+            }
+
+        }
+
+
+
+        /*
+        ==========================================
+        COORDINATE SEARCH
+        ==========================================
+        */
+
+        function getWeatherByCoordinates() {
+
+
+            const latitude =
+                document.getElementById("latitude").value;
+
+
+            const longitude =
+                document.getElementById("longitude").value;
+
+
+            if (
+                latitude === "" ||
+                longitude === ""
+            ) {
+
+                alert(
+                    "Please enter latitude and longitude."
+                );
+
+                return;
+            }
+
+
+            getWeather(
+                latitude,
+                longitude,
+                "Selected Location"
+            );
+
+        }
+
+
+        /*
+        ==========================================
+        LOAD WEATHER WHEN PAGE OPENS
+        ==========================================
+        */
+
+        window.onload = function () {
+
+            searchCity();
+
+        };
+
+
+    </script>
+
+</body>
+
+</html>
